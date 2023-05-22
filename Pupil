@@ -1,0 +1,72 @@
+import pygame
+import time
+
+# Set up the screen dimensions
+WIDTH, HEIGHT = 800, 600
+FPS = 60
+
+# Initialize Pygame
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
+
+# Load the images
+background = pygame.image.load('background_image.png')  # Replace with your own background image
+mirror = pygame.image.load('mirror_image.png')  # Replace with your own mirror image
+boy = pygame.image.load('boy_image.png')  # Replace with your own boy image
+boy_small = pygame.transform.scale(boy, (50, 50))  # Smaller version of the boy
+
+# Set up initial positions and variables
+boy_pos = (WIDTH // 2 - boy.get_width() // 2, HEIGHT // 2 - boy.get_height() // 2)
+boy_small_pos = (WIDTH // 2 - boy_small.get_width() // 2, HEIGHT // 2 - boy_small.get_height() // 2)
+mirror_pos = (WIDTH // 2 - mirror.get_width() // 2, HEIGHT // 2 - mirror.get_height() // 2)
+pupil_radius = 20
+pupil_expanding = False
+pupil_shrinking = False
+
+def draw_scene():
+    # Draw the background, mirror, and the boy
+    screen.blit(background, (0, 0))
+    screen.blit(mirror, mirror_pos)
+    screen.blit(boy, boy_pos)
+    
+    # Draw the expanding pupil
+    pygame.draw.circle(screen, (0, 0, 0), boy_pos, pupil_radius)
+
+def game_loop():
+    global pupil_radius, pupil_expanding, pupil_shrinking
+    
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        
+        if not pupil_expanding and not pupil_shrinking:
+            pupil_expanding = True
+        
+        if pupil_expanding:
+            pupil_radius += 1
+            if pupil_radius > 200:
+                pupil_expanding = False
+                pupil_shrinking = True
+                boy_small_pos = boy_pos
+        
+        if pupil_shrinking:
+            pupil_radius -= 1
+            if pupil_radius <= 20:
+                pupil_shrinking = False
+                break
+        
+        draw_scene()
+        screen.blit(boy_small, boy_small_pos)
+        
+        pygame.display.flip()
+        clock.tick(FPS)
+    
+    # Additional effects (melting mirror and falling backward) can be implemented here
+    time.sleep(2)  # Delay for 2 seconds before quitting
+    pygame.quit()
+
+# Start the game loop
+game_loop()
